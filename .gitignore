@@ -1,0 +1,30 @@
+.venv/
+models/
+__pycache__/
+*.pyc
+*.pyo
+.python-version.local
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyright/
+*.wav
+*.log
+.DS_Store
+
+# Secrets shapes (gitleaks is the real backstop)
+*.pem
+*.key
+*.p12
+*.pfx
+.env
+.env.local
+.env.*.local
+
+# GNOME extension build outputs
+packaging/gnome/schemas/gschemas.compiled
+packaging/gnome/extension/**/schemas/gschemas.compiled
+
+# Claude per-user scratch
+CLAUDE.local.md
+.claude/settings.local.json

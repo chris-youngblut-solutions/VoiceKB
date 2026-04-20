@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="com.github.ctyoungb.voicekb"
+          path="/com/github/ctyoungb/voicekb/">
+    <key name="service-state" type="s">
+      <choices>
+        <choice value="stopped"/>
+        <choice value="warming"/>
+        <choice value="ready"/>
+        <choice value="error"/>
+      </choices>
+      <default>"stopped"</default>
+      <summary>Last-observed daemon state</summary>
+      <description>
+        Written by the GNOME extension when it toggles the service.
+        "warming" = systemctl start is in flight; "ready" = start exited 0
+        (systemd held it until Type=notify READY=1); "error" = non-zero
+        exit; "stopped" = service inactive.
+      </description>
+    </key>
+    <key name="hotkey" type="s">
+      <default>"ctrl-shift-4"</default>
+      <summary>Active hotkey preset</summary>
+      <description>
+        Must match one of voicekb.config.HOTKEY_PRESETS. Reserved for a
+        future extension preference pane; the daemon currently reads its
+        hotkey from the ExecStart argv.
+      </description>
+    </key>
+  </schema>
+</schemalist>

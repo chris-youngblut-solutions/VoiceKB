@@ -1,0 +1,8 @@
+{
+  "uuid": "voicekb@ctyoungb.github.com",
+  "name": "VoiceKB",
+  "description": "Toggle local voice-to-text dictation on/off from the GNOME QuickSettings panel.",
+  "shell-version": ["49"],
+  "url": "https://github.com/in-loop/VoiceKB",
+  "settings-schema": "com.github.ctyoungb.voicekb"
+}

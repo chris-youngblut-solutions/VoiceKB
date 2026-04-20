@@ -1,0 +1,37 @@
+[Unit]
+Description=VoiceKB — local voice-to-text dictation daemon
+Documentation=file:///%h/C1-10P/Dev/TheGarage/VoiceKB/OnTheLift/README.md
+After=graphical-session.target pipewire.service
+Wants=graphical-session.target
+
+[Service]
+Type=notify
+NotifyAccess=main
+WorkingDirectory=%h/C1-10P/Dev/TheGarage/VoiceKB/OnTheLift
+Environment=HF_HOME=%h/C1-10P/Dev/TheGarage/VoiceKB/OnTheLift/models/hf
+ExecStart=%h/C1-10P/Dev/TheGarage/VoiceKB/OnTheLift/.venv/bin/python -m voicekb run-daemon --hotkey ctrl-shift-4
+Restart=on-failure
+RestartSec=2s
+StartLimitBurst=5
+StartLimitIntervalSec=30s
+TimeoutStartSec=60s
+TimeoutStopSec=5s
+
+# Hardening — values vetted per systemd.exec(5). See
+# BulletinBoard/Decisions/voicekb-daemon-toggle-2026-04-20.md for rationale.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/C1-10P/Dev/TheGarage/VoiceKB/OnTheLift/models %t/voicekb
+PrivateTmp=yes
+PrivateDevices=no
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+CapabilityBoundingSet=
+LockPersonality=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+
+[Install]
+WantedBy=default.target

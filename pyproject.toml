@@ -1,0 +1,22 @@
+[project]
+name = "voicekb"
+version = "0.0.1"
+description = "Hold-to-talk voice-to-text keyboard for Wayland on the X1 Pro"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "faster-whisper==1.0.3",
+    "sounddevice==0.4.7",
+    "numpy>=1.26,<2.2",
+    "evdev==1.7.1",
+    "requests>=2.32,<3",
+]
+
+[project.scripts]
+voicekb = "voicekb.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["voicekb"]
