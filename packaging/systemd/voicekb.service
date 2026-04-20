@@ -11,7 +11,7 @@ Type=notify
 NotifyAccess=main
 WorkingDirectory=%h/C1-10P/Dev/TheGarage/VoiceKB/OnTheLift
 Environment=HF_HOME=%h/C1-10P/Dev/TheGarage/VoiceKB/OnTheLift/models/hf
-ExecStart=%h/C1-10P/Dev/TheGarage/VoiceKB/OnTheLift/.venv/bin/python -m voicekb run-daemon --hotkey ctrl-shift-4
+ExecStart=%h/C1-10P/Dev/TheGarage/VoiceKB/OnTheLift/.venv/bin/python -m voicekb run-daemon --hotkey capslock
 RuntimeDirectory=voicekb
 Restart=on-failure
 RestartSec=2s
