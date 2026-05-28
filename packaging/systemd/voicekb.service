@@ -1,6 +1,6 @@
 [Unit]
 Description=VoiceKB — local voice-to-text dictation daemon
-Documentation=file:///%h/C1-10P/Dev/TheGarage/VoiceKB/OnTheLift/README.md
+Documentation=file://@VOICEKB_DIR@/README.md
 After=graphical-session.target pipewire.service
 Wants=graphical-session.target
 StartLimitBurst=5
@@ -9,21 +9,21 @@ StartLimitIntervalSec=30s
 [Service]
 Type=notify
 NotifyAccess=main
-WorkingDirectory=%h/C1-10P/Dev/TheGarage/VoiceKB/OnTheLift
-Environment=HF_HOME=%h/C1-10P/Dev/TheGarage/VoiceKB/OnTheLift/models/hf
-ExecStart=%h/C1-10P/Dev/TheGarage/VoiceKB/OnTheLift/.venv/bin/python -m voicekb run-daemon --hotkey capslock
+WorkingDirectory=@VOICEKB_DIR@
+Environment=HF_HOME=@VOICEKB_DIR@/models/hf
+ExecStart=@VOICEKB_DIR@/.venv/bin/python -m voicekb run-daemon --hotkey capslock
 RuntimeDirectory=voicekb
 Restart=on-failure
 RestartSec=2s
 TimeoutStartSec=60s
 TimeoutStopSec=5s
 
-# Hardening — values vetted per systemd.exec(5). See
-# BulletinBoard/Decisions/voicekb-daemon-toggle-2026-04-20.md for rationale.
+# Hardening — values vetted per systemd.exec(5).
+# @VOICEKB_DIR@ is substituted with the repo path by `just install-user`.
 NoNewPrivileges=yes
 ProtectSystem=strict
 ProtectHome=read-only
-ReadWritePaths=%h/C1-10P/Dev/TheGarage/VoiceKB/OnTheLift/models %t/voicekb
+ReadWritePaths=@VOICEKB_DIR@/models %t/voicekb
 PrivateTmp=yes
 PrivateDevices=no
 RestrictAddressFamilies=AF_UNIX AF_NETLINK

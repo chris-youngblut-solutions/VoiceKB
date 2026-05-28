@@ -48,7 +48,9 @@ install-user: sync fetch-model
     set -euo pipefail
     echo "[install] systemd --user unit"
     mkdir -p ~/.config/systemd/user
-    cp packaging/systemd/voicekb.service ~/.config/systemd/user/
+    sed 's|@VOICEKB_DIR@|{{justfile_directory()}}|g' \
+        packaging/systemd/voicekb.service \
+        > ~/.config/systemd/user/voicekb.service
     systemctl --user daemon-reload
 
     echo "[install] GSettings schema"
