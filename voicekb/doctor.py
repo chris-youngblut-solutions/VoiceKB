@@ -11,9 +11,9 @@ import sounddevice as sd
 
 from .config import Config
 
-_OK = "✅"
-_BAD = "❌"
-_WARN = "🟡"
+_OK = "[ OK ]"
+_BAD = "[FAIL]"
+_WARN = "[WARN]"
 
 
 def _net_listeners_for_pid(pid: int) -> list[str]:

@@ -3,7 +3,7 @@
 Hold-to-talk local voice-to-text dictation for Wayland on the X1 Pro.
 Background `systemd --user` service + GNOME Shell QuickSettings toggle.
 
-**Tier**: T1  **Language**: Python 3.12  **Test discipline**: pragmatic
+**Language**: Python 3.12
 
 ## What this is
 
@@ -12,14 +12,14 @@ the GNOME top-right panel. All local (no network after model fetch),
 all user-scope (no sudo daemon, no root), all RAM-only for audio.
 Engine: faster-whisper int8 `medium.en` on CPU. Injection: `wtype` →
 `xdotool` → `wl-copy` fallback chain. Hotkey: evdev listener today,
-oxpctl D-Bus stub for tomorrow.
+an optional D-Bus adapter stub for device daemons.
 
 ## Build / test / lint
 
 ```sh
 just                 # list all recipes
 just sync            # build .venv from pinned deps
-just fetch-model     # pre-cache medium.en (~770 MB) into ./models/
+just fetch-model     # pre-cache medium.en (~1.5 GB on disk) into ./models/
 just doctor          # read-only sanity checks
 just run             # foreground hotkey listener (terminal, Ctrl-C to stop)
 just install-user    # install systemd --user service + GNOME extension
@@ -35,8 +35,8 @@ just clean           # nuke .venv + models
 - `voicekb/transcribe.py` — faster-whisper wrapper.
 - `voicekb/hotkey_evdev.py` — user-mode evdev listener (per-device
   state for phantom-event isolation).
-- `voicekb/hotkey_oxpctl.py` — Phase C stub; D-Bus subscription to
-  oxpctl's `InputEvent` signal once oxpctl Phase 2 ships.
+- `voicekb/hotkey_oxpctl.py` — call-compatible stub for a future
+  device-daemon D-Bus hotkey adapter.
 - `voicekb/inject.py` — tiered injector (`wtype` → `xdotool` → `wl-copy`).
 - `voicekb/doctor.py` — read-only diagnostic suite.
 - `voicekb/sdnotify.py` — pure-stdlib `sd_notify()` for `Type=notify`.
@@ -55,7 +55,7 @@ just clean           # nuke .venv + models
 - GitHub Actions pinned by SHA.
 - No `print()` in committed code — logger only.
 
-## Hard constraints (inherited from Phase B)
+## Hard constraints
 
 - No sudo daemon, no root, no polkit, no Secure-Boot changes.
 - No network after `just fetch-model`.

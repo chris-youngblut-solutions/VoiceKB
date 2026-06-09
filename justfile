@@ -1,5 +1,5 @@
-# VoiceKB — hold-to-talk voice-to-text for the X1 Pro.
-# Phase B prototype. No sudo, no system installs, no network after fetch-model.
+# VoiceKB — hold-to-talk voice-to-text for Wayland.
+# No sudo, no system installs, no network after fetch-model.
 
 set shell := ["bash", "-euo", "pipefail", "-c"]
 set dotenv-load := false

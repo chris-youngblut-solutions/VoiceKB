@@ -1,11 +1,12 @@
-"""oxpctl D-Bus adapter — stub for Phase C.
+"""oxpctl D-Bus adapter — placeholder.
 
-Once oxpctl Phase 2 ships (see X1ProLinux/OnTheLift/oxpctl/DESIGN.md §14),
-bind a `voice_trigger` event in /etc/oxpctl/config.yaml to a dummy exec
-and subscribe to the InputEvent signal here. The signal carries
-(event_name, metadata) per DESIGN §6 line 371.
+Intended future path: bind a `voice_trigger` event in the device daemon's
+config and subscribe to its InputEvent D-Bus signal here. Until that daemon
+interface ships, the evdev adapter is the only hotkey backend.
 
-Phase B runs on hotkey_evdev only. This file is a placeholder."""
+The signature mirrors `hotkey_evdev.dispatch_hold_to_talk` exactly so the
+adapter is call-compatible from `__main__` and fails with the intended
+error, not a TypeError."""
 
 from __future__ import annotations
 
@@ -20,8 +21,9 @@ def dispatch_hold_to_talk(
     chord_keys: tuple[str, ...],  # noqa: ARG001
     on_press: Callable[[], None],  # noqa: ARG001
     on_release: Callable[[], None],  # noqa: ARG001
+    should_stop: Callable[[], bool] | None = None,  # noqa: ARG001
 ) -> None:
     raise OxpctlUnavailableError(
-        "oxpctl D-Bus dispatch is a Phase C feature and not wired up yet. "
+        "oxpctl D-Bus dispatch is not wired up yet. "
         "Use the default evdev hotkey adapter."
     )

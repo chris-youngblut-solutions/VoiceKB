@@ -1,11 +1,14 @@
-# VoiceKB — hold-to-talk voice-to-text for the X1 Pro
+# VoiceKB — hold-to-talk voice-to-text for Wayland
 
-Local, hotkey-driven dictation with a GNOME toggle. No sudo daemon,
-no polkit, no Secure Boot changes, no network after the one-time
-model fetch. Audio is kept in RAM only, never written to disk.
+Local dictation: hold a hotkey, speak, release — the transcript lands
+in whatever input is focused. GNOME QuickSettings toggle included. No
+sudo daemon, no polkit, no Secure Boot changes, no network after the
+one-time model fetch. Audio is kept in RAM only, never written to disk.
 
-Target: X1 Pro (Ryzen AI 9 HX 370), Fedora 43 / kernel 6.19.12,
-Wayland. CPU-only faster-whisper `medium.en` (int8).
+Engine: CPU-only faster-whisper `medium.en` (int8). Tested on a
+OneXPlayer X1 Pro (Ryzen AI 9 HX 370), Fedora 43 / kernel 6.19.12,
+Wayland/GNOME; nothing in it is device-specific beyond that test
+coverage.
 
 ## Prereqs (check before first run)
 
@@ -42,7 +45,7 @@ pinned in `pyproject.toml` and installed into a project-local
 
 ```
 just sync          # build .venv from pinned deps
-just fetch-model   # pre-cache medium.en into ./models/ (~770 MB)
+just fetch-model   # pre-cache medium.en into ./models/ (~1.5 GB on disk)
 just doctor        # read-only checks — tell you if anything's wrong
 just run           # starts the hotkey listener; Ctrl-C to stop
 ```
@@ -74,8 +77,9 @@ gsettings set org.gnome.desktop.input-sources xkb-options "['caps:none']"
 - Captures 16 kHz mono audio to an in-memory ring buffer while the
   hotkey is held.
 - On release, transcribes via faster-whisper `medium.en` (CPU int8).
-- Injects text via a tiered fallback: `wtype` → `xdotool` → `wl-copy`
-  (clipboard + manual paste). The first tool that succeeds wins.
+- Injects text via `wtype` or `xdotool` (first that succeeds); if both
+  fail, copies the transcript to the clipboard via `wl-copy` for a
+  manual paste — a last-resort fallback, not a peer injector.
 - Zeros the buffer. Logs only latency + token count to stderr.
 
 Doesn't:
@@ -83,7 +87,8 @@ Doesn't:
 - Persist any audio or transcript to disk.
 - Open any network socket after `fetch-model`.
 - Run as root. Use sudo. Write outside this directory.
-- Create systemd units, udev rules, or polkit rules.
+- Create system-level systemd units, udev rules, or polkit rules
+  (`just install-user` creates a `systemd --user` unit only).
 
 ## Install as a background service (GNOME toggle)
 
@@ -104,6 +109,11 @@ gnome-extensions enable voicekb@ctyoungb.github.com
 Open the QuickSettings panel; click the VoiceKB toggle to start the
 service. Subtitle shows `Warming…` during model load (multi-second
 on CPU), then `Ready`. Use the hotkey as usual. Click again to stop.
+
+Note: the service unit runs with `--hotkey capslock` (see the
+CapsLock XKB note above); the foreground `just run` default is
+`Ctrl+Shift+4`. Edit `packaging/systemd/voicekb.service` to change
+the service hotkey.
 
 Useful CLI:
 
@@ -141,14 +151,14 @@ just uninstall-user          # clean removal of unit + schema + extension
   clip during startup; if still slow, the model is likely loading from
   a cold cache (first run after `fetch-model`).
 
-## Phase C (deferred forks, not in this release)
+## Deferred (not in this release)
 
-- Swap `hotkey_evdev` for `hotkey_oxpctl` once oxpctl Phase 2 D-Bus
-  lands (stub already present).
+- An alternative hotkey adapter over a device-daemon D-Bus interface
+  (call-compatible stub present at `voicekb/hotkey_oxpctl.py`).
 - Upgrade toggle semantic from "service start/stop" to "GSettings-gated
   hotkey, daemon always up" for instant-resume (the schema is already
   shaped for it — additive change).
-- Try Vulkan whisper.cpp on the Radeon 890M iGPU (2-12× faster).
+- Try Vulkan whisper.cpp on the Radeon 890M iGPU (unbenchmarked here; upstream reports large speedups).
 - AT-SPI or xdg-desktop-portal RemoteDesktop path for native-Wayland
   injection (covers Firefox / GNOME Text Editor without clipboard).
 - Revisit NPU path via FastFlowLM/Lemonade when Fedora hits

@@ -1,14 +1,13 @@
 [project]
 name = "voicekb"
-version = "0.0.1"
-description = "Hold-to-talk voice-to-text keyboard for Wayland on the X1 Pro"
+version = "0.1.0"
+description = "Hold-to-talk voice-to-text keyboard for Wayland"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "faster-whisper==1.0.3",
     "sounddevice==0.4.7",
     "numpy>=1.26,<2.2",
     "evdev==1.7.1",
-    "requests>=2.32,<3",
 ]
 
 [project.scripts]
