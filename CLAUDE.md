@@ -45,8 +45,6 @@ just clean           # nuke .venv + models
 - `packaging/gnome/schemas/` — GSettings schema for extension state.
 - `packaging/gnome/extension/voicekb@ctyoungb.github.com/` — GNOME Shell 49
   QuickToggle extension.
-- `../BulletinBoard/Decisions/` — ADR-style decision logs.
-- `../BulletinBoard/FastLane/` — scope seed + question inventory.
 
 ## Conventions
 
@@ -70,6 +68,4 @@ Apache-2.0 OR MIT dual (`LICENSE-APACHE`, `LICENSE-MIT`).
 
 ## See also
 
-- `../BulletinBoard/FastLane/voicekb-fastlane.md` — premise table + question inventory.
-- `../BulletinBoard/Decisions/` — dated decision log.
-- `~/.claude/CLAUDE.md` — global invariants across every repo.
+- `README.md` — what it is, install, tradeoffs.

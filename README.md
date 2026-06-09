@@ -1,9 +1,8 @@
 # VoiceKB — hold-to-talk voice-to-text for the X1 Pro
 
-Local, hotkey-driven dictation with a GNOME toggle. Zero-risk to
-device or data: no sudo daemon, no polkit, no Secure Boot changes,
-no network after the one-time model fetch. Audio is kept in RAM
-only, never written to disk.
+Local, hotkey-driven dictation with a GNOME toggle. No sudo daemon,
+no polkit, no Secure Boot changes, no network after the one-time
+model fetch. Audio is kept in RAM only, never written to disk.
 
 Target: X1 Pro (Ryzen AI 9 HX 370), Fedora 43 / kernel 6.19.12,
 Wayland. CPU-only faster-whisper `medium.en` (int8).
@@ -154,6 +153,3 @@ just uninstall-user          # clean removal of unit + schema + extension
   injection (covers Firefox / GNOME Text Editor without clipboard).
 - Revisit NPU path via FastFlowLM/Lemonade when Fedora hits
   kernel 7.0+.
-
-See `../BulletinBoard/FastLane/voicekb-fastlane.md` for the premise
-table and `../BulletinBoard/Decisions/` for dated decision logs.
