@@ -10,6 +10,11 @@ dependencies = [
     "evdev==1.7.1",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "ruff==0.8.4",
+]
+
 [project.scripts]
 voicekb = "voicekb.__main__:main"
 
