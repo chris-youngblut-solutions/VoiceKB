@@ -1,14 +1,26 @@
-# VoiceKB — hold-to-talk voice-to-text for Wayland
+# VoiceKB
 
-Local dictation: hold a hotkey, speak, release — the transcript lands
-in whatever input is focused. GNOME QuickSettings toggle included. No
-sudo daemon, no polkit, no Secure Boot changes, no network after the
-one-time model fetch. Audio is kept in RAM only, never written to disk.
+A user-scope CLI and GNOME Shell extension for hold-to-talk voice-to-text on Wayland: hold a hotkey, speak, release, and the transcript lands in whatever input is focused. No sudo daemon, no polkit, no Secure Boot changes, no network after the one-time model fetch. Audio is kept in RAM only, never written to disk.
 
-Engine: CPU-only faster-whisper `medium.en` (int8). Tested on a
-OneXPlayer X1 Pro (Ryzen AI 9 HX 370), Fedora 43 / kernel 6.19.12,
-Wayland/GNOME; nothing in it is device-specific beyond that test
-coverage.
+Engine: CPU-only faster-whisper `medium.en` (int8). Tested on a OneXPlayer X1 Pro (Ryzen AI 9 HX 370), Fedora 43 / kernel 6.19.12, Wayland/GNOME; nothing in it is device-specific beyond that test coverage.
+
+## What it does
+
+- Captures 16 kHz mono audio to an in-memory ring buffer while the
+  hotkey is held.
+- On release, transcribes via faster-whisper `medium.en` (CPU int8).
+- Injects text via `wtype` or `xdotool` (first that succeeds); if both
+  fail, copies the transcript to the clipboard via `wl-copy` for a
+  manual paste — a last-resort fallback, not a peer injector.
+- Zeros the buffer. Logs only latency + token count to stderr.
+
+Does not:
+
+- Persist any audio or transcript to disk.
+- Open any network socket after `fetch-model`.
+- Run as root. Use sudo. Write outside this directory.
+- Create system-level systemd units, udev rules, or polkit rules
+  (`just install-user` creates a `systemd --user` unit only).
 
 ## Prereqs (check before first run)
 
@@ -70,25 +82,22 @@ layer so holding it doesn't toggle caps state:
 gsettings set org.gnome.desktop.input-sources xkb-options "['caps:none']"
 ```
 
-(evdev still sees the raw keycode, so our listener keeps working.)
+(evdev still sees the raw keycode, so the listener keeps working.)
 
-## What it does (and doesn't)
+## How it works
 
-- Captures 16 kHz mono audio to an in-memory ring buffer while the
-  hotkey is held.
-- On release, transcribes via faster-whisper `medium.en` (CPU int8).
-- Injects text via `wtype` or `xdotool` (first that succeeds); if both
-  fail, copies the transcript to the clipboard via `wl-copy` for a
-  manual paste — a last-resort fallback, not a peer injector.
-- Zeros the buffer. Logs only latency + token count to stderr.
-
-Doesn't:
-
-- Persist any audio or transcript to disk.
-- Open any network socket after `fetch-model`.
-- Run as root. Use sudo. Write outside this directory.
-- Create system-level systemd units, udev rules, or polkit rules
-  (`just install-user` creates a `systemd --user` unit only).
+- `voicekb/capture.py` writes 16 kHz mono audio to a RAM-only ring
+  buffer (`sounddevice`) while the hotkey is held; the buffer is zeroed
+  on release.
+- `voicekb/hotkey_evdev.py` is the user-mode evdev listener, with
+  per-device state for phantom-event isolation; `voicekb/hotkey_oxpctl.py`
+  is a call-compatible stub for a future device-daemon D-Bus adapter.
+- `voicekb/transcribe.py` wraps faster-whisper `medium.en` (CPU int8).
+- `voicekb/inject.py` is a tiered injector: `wtype` → `xdotool` →
+  `wl-copy` fallback chain.
+- `packaging/` carries the `systemd --user` unit (`Type=notify`,
+  hardened) and the GNOME Shell 49 QuickToggle extension plus its
+  GSettings schema; `voicekb/doctor.py` is the read-only diagnostic suite.
 
 ## Install as a background service (GNOME toggle)
 
@@ -135,10 +144,9 @@ just uninstall-user          # clean removal of unit + schema + extension
   Xwayland clients (most terminals, VS Code, Electron apps) receive
   injection directly.
 - **Each toggle-ON pays the model-load cost** (multi-second, CPU int8).
-  Deliberate simplicity tradeoff — the extension shows `Warming…` during
-  this window. An always-up daemon with a GSettings-gated hotkey (lower
-  latency, higher idle memory) is a named future upgrade; the GSettings
-  schema is already shaped for it.
+  The extension shows `Warming…` during this window. An always-up daemon
+  with a GSettings-gated hotkey (lower latency, higher idle memory) is a
+  named future upgrade; the GSettings schema is already shaped for it.
 
 ### Troubleshooting
 
@@ -151,7 +159,18 @@ just uninstall-user          # clean removal of unit + schema + extension
   clip during startup; if still slow, the model is likely loading from
   a cold cache (first run after `fetch-model`).
 
-## Deferred (not in this release)
+## Status
+
+Version 0.1.0, SemVer (Decision 5). Python 3.12 (`>=3.12,<3.13`); deps
+pinned in `pyproject.toml` (faster-whisper 1.0.3, sounddevice 0.4.7,
+evdev 1.7.1, numpy `>=1.26,<2.2`).
+
+Shipped: the evdev hotkey listener, RAM-only capture, faster-whisper
+`medium.en` (CPU int8) transcription, the `wtype` → `xdotool` →
+`wl-copy` tiered injector, the `systemd --user` unit, and the GNOME
+Shell 49 QuickToggle extension.
+
+Not in this release:
 
 - An alternative hotkey adapter over a device-daemon D-Bus interface
   (call-compatible stub present at `voicekb/hotkey_oxpctl.py`).
@@ -163,3 +182,7 @@ just uninstall-user          # clean removal of unit + schema + extension
   injection (covers Firefox / GNOME Text Editor without clipboard).
 - Revisit NPU path via FastFlowLM/Lemonade when Fedora hits
   kernel 7.0+.
+
+## License
+
+Apache-2.0 OR MIT dual (`LICENSE-APACHE`, `LICENSE-MIT`).
