@@ -4,15 +4,15 @@ version = "0.1.0"
 description = "Hold-to-talk voice-to-text keyboard for Wayland"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "faster-whisper==1.0.3",
-    "sounddevice==0.4.7",
+    "faster-whisper==1.2.1",
+    "sounddevice==0.5.5",
     "numpy>=1.26,<2.2",
-    "evdev==1.7.1",
+    "evdev==1.9.3",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "ruff==0.8.4",
+    "ruff==0.15.18",
 ]
 
 [project.scripts]
